@@ -92,7 +92,10 @@ var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8345"));
 var _abi = [{"constant":false,"inputs":[{"name":"_greeting","type":"bytes32"}] ~~~~ }];
 var 변수명 = new web3.eth.Contract(_abi, "0xE4c0....(배포에서 얻은 지갑)");
 
+
 var str = web3.utils.toHex("Hello World!");
+
 변수명.methods.함수명(str).send({from: "A(첫 번째 지갑에서 얻은 주소", gas: 1000000});
 변수명.methods.함수명3().call().then(function(value) { console.log(web3.utils.hexToUtf8(value)); });  
+변수명.methods.함수명().call().then(function(value) { console.log(value)});
 ```
