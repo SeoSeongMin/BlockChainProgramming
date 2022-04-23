@@ -158,4 +158,46 @@ print("valid: ", valid)
 
 ----------------
 
+### Gas
+* 최근 블록 출력
+```
+web3.eth.getBlock('latest')
+```
 
+* gas 한도
+```
+web3.eth.getBlock('latest').gasLimit
+```
+
+* gas 가격
+```
+web3.eth.gasPrice
+```
+
+* gas 사용량 (트랜잭션 후)
+```
+web3.eth.getTransactionReceipt(transHash).gasUsed
+```
+
+* gas 거래비용
+```
+txdata = "66500000546560484000640640549789613250123648794000046056454648"
+
+def count_zero_bytes(data):
+    count = 0
+    for i in range(0, len(data), 2):
+        byte = data[i:i+2]
+        if byte == "00":
+            count += 1
+    return count
+
+def count_non_zero_bytes(data):
+    return (len(data) / 2) - count_zero_bytes(data)
+
+print("총 거래비용: ",count_zero_bytes(txdata) * 4 + count_non_zero_bytes(txdata) * 68)
+```
+
+* 거래 건수 nonce
+```
+web3.eth.getTransactionCount(web3.eth.거래한 계좌)
+```
