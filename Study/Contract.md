@@ -46,7 +46,7 @@ contract '클래스'{
 
 ------------------------------------------------
 
-# 3단계 배포
+# 3단계 '노드'에서 배포 (+ ganache 배포 8345)
 ```
 %%writefile src/'SAVE_NAME_Deploy'.js
 
@@ -81,6 +81,81 @@ _contract
 0xE4c0....
 ```
 
+# 3단계 '노드'에서 배포  (+ ganache 배포 8345)
+```
+%%writefile src/'SAVE_NAME_Deploy'.js
+var Web3 = require('web3');
+var web3;
+
+if (typeof web3 !== 'undefined') {
+    web3 = new Web3(web3.currentProvider);
+} else {
+    web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8345"));
+}
+
+var _abi = [{"constant":false,"inputs":[{"name":"_greeting","type":"bytes32"}] ~~~~ }];
+var _bin = "123987123987123987 ~~~~";
+var _contract = new web3.eth.Contract(_abi);
+
+
+_contract
+    .deploy({ data: "0x"+_bin })
+    .send({
+     from: 'A(지갑 첫 번째 주소)',
+     gas: '1000000'
+    }, function (e, transactionHash){
+        console.log(e, transactionHash);
+    })
+    .then(function(newContractInstance){
+        console.log("contract address: "+newContractInstance.options.address)
+    });
+```
+# 3단계 Geth 배포
+```
+%%writefile src/timerDeploy-ganache2.js
+var Web3 = require('web3');
+var _abiBinJson = require('./Timer.json');     
+
+var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8345"));
+
+contractName=Object.keys(_abiBinJson.contracts); 
+console.log("- contract name: ", contractName);
+_abi=_abiBinJson.contracts[contractName].abi;
+_abiArray=JSON.parse(_abi);      //JSON parsing needed!!
+_bin=_abiBinJson.contracts[contractName].bin;
+
+console.log("- ABI: " + _abiArray);
+console.log("- Bytecode: " + _bin);
+
+async function deploy() {
+    const accounts = await web3.eth.getAccounts();
+    console.log("Deploying the contract from " + accounts[0]);
+    var deployed = await new web3.eth.Contract(_abiArray)
+        .deploy({data: "0x"+_bin})
+        .send({from: accounts[0], gas: 364124}, function(err, transactionHash) {
+                if(!err) console.log("hash: " + transactionHash); 
+        })
+        //.then(function(newContractInstance){
+        //    console.log(newContractInstance)
+        //});
+    console.log("---> The contract deployed to: " + deployed.options.address)
+}
+deploy()
+```
+
+# 3단계 REMIX 배포
+```
+http://remix.ethereum.org/#optimize=false&runs=200&evmVersion=null&version=soljson-v0.6.0+commit.26b70077.js
+* 1. 파일버튼을 눌러 Timer.sol이라는 파일을 만들고 pragma ~부터 오른쪽에 붙여넣는다.
+* 2. 왼쪽 solidy compile누르고 버전 0.4.25를 눌른다. 그후 compile Timer.sol을 누른다.
+* 3. 왼쪽 아래 배포(deploy)를 누르고 'ENVIRONMENT'에서 JavaScript VM (London)을 누르고 Deploy를 누른다.
+* 4. Deployed Contratcts 아래에 >TIMER AT ~~파일이 생긴다. 복사한다. 우리는
+* 5. 0xd9145CCE52D386f254917e481eB44e9943F39138 <- 배포된 주소가 나온다.
+* 6. TIMER AT~~부분 화살표를 내려보면 우리가 만들어놓은 함수마다 버튼이 생긴다.(3개)
+* 7. start를 누르고 오른쪽 (녹색 체크모양)를 자세히 살펴보면 from, to, gas등 볼 수 있다.
+* 8. 에러가 안나면 이 코드는 에러없이 잘 됐다고 생각하면 된다.
+
+```
 --------------------------------------------------
 
 # 4단계 사용
